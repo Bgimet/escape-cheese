@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Festin du Fromage Perdu</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f9f5f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #ff6f61, #ffcc66);
+            padding: 20px;
+            font-size: 2.5em;
+            color: #fff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            margin: 10px 0;
+            height: 10px;
+            position: sticky;
+            top: 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #ff6f61;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        #intro {
+            text-align: center;
+            background: linear-gradient(135deg, #ffe3a3, #fff3e0);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: opacity 0.5s ease, transform 0.5s ease, height 0.5s ease, margin 0.5s ease;
+        }
+
+        #intro.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #game-content {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        section {
+            display: none;
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .instruction {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: #e55a4f;
+        }
+
+        .hint {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 6px solid #f5c6cb;
+            border-radius: 5px;
+        }
+
+        .answer {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 6px solid #c3e6cb;
+            border-radius: 5px;
+        }
+
+        .error {
+            margin-top: 15px;
+            color: #721c24;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Le Festin du Fromage Perdu
+</header>
+
+<div class="progress-bar">
+    <div class="progress"></div>
+</div>
+
+<div id="container">
+    <div id="intro" class="active">
+        <h2>Bienvenue au Festin du Fromage Perdu 🎭🧀</h2>
+        <p>
+            Par une nuit froide et mystérieuse, dans un village au pied des Alpes, une légende circule depuis des siècles :
+            <br><strong>le Grand Plateau de Fromage Sacré</strong>. Ce trésor légendaire, garni des plus rares fromages de France,
+            est gardé par une ancienne confrérie.
+        </p>
+        <p>
+            Mais pour accéder à ce plateau tant convoité, tu devras prouver ta valeur et ton amour du fromage à travers cinq épreuves
+            périlleuses. Chaque épreuve dévoilera un fragment du secret menant au Festin.
+        </p>
+        <p>
+            Seras-tu à la hauteur ? Mets ton esprit, ton nez et tes papilles à l’épreuve !
+        </p>
+        <p><strong>Entrez votre nom pour débuter l’aventure :</strong></p>
+        <input type="text" id="player-name" placeholder="Entrez votre nom">
+        <button onclick="startGame()">Commencer l’Aventure</button>
+    </div>
+
+    <div id="game-content">
+        <!-- Épreuves 1 à 5 -->
+        <section id="step1">
+            <h2>Épreuve 1 : Les Paroles Perdues 🎤</h2>
+            <div class="instruction">
+                Trouve les initiales des artistes des chansons suivantes pour révéler un mot secret.
+            </div>
+            <ul>
+                <li>"Je t’aimais, je t’aime et je t’aimerai..." (Francis Cabrel)</li>
+                <li>"Dans la zone, ça tire dans tous les sens..." (Gazo)</li>
+                <li>"Monde cruel, dans lequel Lucifer est roi..." (Booba)</li>
+            </ul>
+            <input type="text" id="answer1" placeholder="Votre réponse ici">
+            <button onclick="checkAnswer(1, 'FGB', 'Fran...Gaz...Boo')">Valider</button>
+            <button onclick="showAnswer(1, 'FGB')">Réponse</button>
+            <div class="hint" id="hint1">Indice : Fran...Gaz...Boo</div>
+            <div class="answer" id="answer-display-1">Réponse : FGB</div>
+            <div class="error" id="error-display-1"></div>
+        </section>
+
+        <section id="step2">
+            <h2>Épreuve 2 : L'Échelle des Saveurs 🧀</h2>
+            <div class="instruction">
+                Classe ces fromages du plus doux au plus intense pour obtenir un code basé sur leurs initiales.
+            </div>
+            <ul>
+                <li>Livarot</li>
+                <li>Saint-Marcellin</li>
+                <li>Bleu d’Auvergne</li>
+                <li>Taleggio</li>
+                <li>Morbier</li>
+            </ul>
+            <input type="text" id="answer2" placeholder="Votre réponse ici">
+            <button onclick="checkAnswer(2, 'SMTBM', 'Classez par intensité croissante')">Valider</button>
+            <button onclick="showAnswer(2, 'SMTBM')">Réponse</button>
+            <div class="hint" id="hint2">Indice : Classez par intensité croissante</div>
+            <div class="answer" id="answer-display-2">Réponse : SMTBM</div>
+            <div class="error" id="error-display-2"></div>
+        </section>
+
+        <section id="step3">
+            <h2>Épreuve 3 : Fromage et Vin 🍷</h2>
+            <div class="instruction">
+                Associe chaque fromage avec le bon type de vin pour révéler un mot mystique.
+            </div>
+            <ul>
+                <li>Brie</li>
+                <li>Roquefort</li>
+                <li>Chèvre</li>
+            </ul>
+            <p><strong>Types de vin disponibles :</strong></p>
+            <ul>
+                <li>A. Vin blanc sec</li>
+                <li>B. Vin rouge fruité</li>
+                <li>C. Vin doux naturel</li>
+            </ul>
+            <input type="text" id="answer3" placeholder="Votre réponse ici">
+            <button onclick="checkAnswer(3, 'ACA', 'Le Brie aime le vin blanc sec')">Valider</button>
+            <button onclick="showAnswer(3, 'ACA')">Réponse</button>
+            <div class="hint" id="hint3">Indice : Le Brie aime le vin blanc sec</div>
+            <div class="answer" id="answer-display-3">Réponse : ACA</div>
+            <div class="error" id="error-display-3"></div>
+        </section>
+
+        <section id="step4">
+            <h2>Épreuve 4 : Le Boss des Jeux Vidéo 🎮</h2>
+            <div class="instruction">
+                Sélectionne les bonnes réponses pour chaque question. Valide ensuite ton choix !
+            </div>
+            <ul>
+                <li>
+                    Quel est le héros de *The Legend of Zelda* ?
+                    <br>
+                    <button onclick="selectAnswer(4, 1, 'A')">A. Mario</button>
+                    <button onclick="selectAnswer(4, 1, 'B')">B. Link</button>
+                    <button onclick="selectAnswer(4, 1, 'C')">C. Zelda</button>
+                </li>
+                <li>
+                    Dans quel jeu explore-t-on Bordeciel en tant que Dovahkiin ?
+                    <br>
+                    <button onclick="selectAnswer(4, 2, 'A')">A. Skyrim</button>
+                    <button onclick="selectAnswer(4, 2, 'B')">B. Witcher</button>
+                    <button onclick="selectAnswer(4, 2, 'C')">C. Elden Ring</button>
+                </li>
+                <li>
+                    Dans quel jeu des personnages Nintendo s’affrontent-ils ?
+                    <br>
+                    <button onclick="selectAnswer(4, 3, 'A')">A. Mario Kart</button>
+                    <button onclick="selectAnswer(4, 3, 'B')">B. Super Smash Bros. Brawl</button>
+                    <button onclick="selectAnswer(4, 3, 'C')">C. Animal Crossing</button>
+                </li>
+            </ul>
+            <button onclick="validateStep4()">Valider</button>
+            <div class="hint" id="hint4">Indice : Le héros de Zelda est Link.</div>
+            <div class="answer" id="answer-display-4">Réponse : BAB</div>
+            <div class="error" id="error-display-4"></div>
+        </section>
+
+        <section id="step5">
+            <h2>Épreuve 5 : L’Odeur de la Tentation 👃</h2>
+            <div class="instruction">
+                Sens les pots et identifie les épices pour trouver un mot mystique.
+            </div>
+            <ul>
+                <li>Curry</li>
+                <li>Cannelle</li>
+                <li>Muscade</li>
+            </ul>
+            <input type="text" id="answer5" placeholder="Votre réponse ici">
+            <button onclick="checkAnswer(5, 'CCM', 'L’épice chaude et jaune est le curry')">Valider</button>
+            <button onclick="showAnswer(5, 'CCM')">Réponse</button>
+            <div class="hint" id="hint5">Indice : L’épice chaude et jaune est le curry</div>
+            <div class="answer" id="answer-display-5">Réponse : CCM</div>
+            <div class="error" id="error-display-5"></div>
+        </section>
+
+        <section id="success">
+            <h2>Félicitations ! 🎉</h2>
+            <p>Tu as terminé toutes les épreuves et découvert le Grand Plateau de Fromage Sacré !</p>
+        </section>
+    </div>
+</div>
+
+<script>
+    const errorCounters = [0, 0, 0, 0, 0];
+    const selectedAnswers = {
+        4: { 1: null, 2: null, 3: null }
+    };
+
+    function startGame() {
+        const playerName = document.getElementById('player-name').value.trim();
+        if (playerName) {
+            const introSection = document.getElementById('intro');
+            introSection.classList.add('hidden');
+            setTimeout(() => {
+                introSection.classList.remove('active');
+                document.getElementById('step1').classList.add('active');
+                updateProgress(1);
+            }, 500);
+        } else {
+            alert('Veuillez entrer votre nom.');
+        }
+    }
+
+    function updateProgress(step) {
+        const progress = document.querySelector('.progress');
+        if (!progress) {
+            console.error('La barre de progression est manquante dans le DOM.');
+            return;
+        }
+
+        const totalSteps = 5;
+        const percentage = (step / totalSteps) * 100;
+        progress.style.width = `${percentage}%`;
+    }
+
+    function navigateToStep(step) {
+        const activeSection = document.querySelector('section.active');
+        if (activeSection) {
+            activeSection.classList.remove('active');
+            activeSection.style.opacity = '0';
+            activeSection.style.transform = 'translateY(20px)';
+        }
+
+        setTimeout(() => {
+            const nextStep = document.getElementById(`step${step}`);
+            if (nextStep) {
+                nextStep.classList.add('active');
+                updateProgress(step);
+            } else {
+                document.getElementById('success').classList.add('active');
+            }
+        }, 500);
+    }
+
+    function checkAnswer(step, correctAnswer, hintMessage) {
+        const userAnswer = document.getElementById(`answer${step}`).value.trim().toUpperCase();
+        const errorDisplay = document.getElementById(`error-display-${step}`);
+        if (userAnswer === correctAnswer) {
+            navigateToStep(step + 1);
+            errorDisplay.textContent = "";
+        } else {
+            errorCounters[step - 1]++;
+            errorDisplay.textContent = "Réponse incorrecte. Réessayez !";
+            if (errorCounters[step - 1] === 3) {
+                const hint = document.getElementById(`hint${step}`);
+                hint.style.display = "block";
+                hint.innerText = hintMessage;
+            }
+        }
+    }
+
+    function showAnswer(step, correctAnswer) {
+        const answerDisplay = document.getElementById(`answer-display-${step}`);
+        answerDisplay.style.display = "block";
+        answerDisplay.textContent = `Réponse : ${correctAnswer}`;
+    }
+
+    function selectAnswer(step, questionNumber, answer) {
+        selectedAnswers[step][questionNumber] = answer;
+        const buttons = document.querySelectorAll(`#step${step} li:nth-child(${questionNumber}) button`);
+        buttons.forEach(button => button.style.backgroundColor = "");
+        const selectedButton = [...buttons].find(button => button.textContent.startsWith(answer));
+        selectedButton.style.backgroundColor = "#ffcc66";
+    }
+
+    function validateStep4() {
+        const errorDisplay = document.getElementById("error-display-4");
+        const answers = selectedAnswers[4];
+        const correctAnswers = ['B', 'A', 'B'];
+        const userAnswers = [answers[1], answers[2], answers[3]];
+
+        if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
+            navigateToStep(5);
+            errorDisplay.textContent = "";
+        } else {
+            errorCounters[3]++;
+            errorDisplay.textContent = "Réponse incorrecte. Réessayez !";
+            if (errorCounters[3] === 3) {
+                const hint = document.getElementById("hint4");
+                hint.style.display = "block";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
